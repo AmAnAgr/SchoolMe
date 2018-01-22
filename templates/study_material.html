@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block post %}
+
+<div class="card-deck mt-4 mb-4">
+{% if subjects is None %} Select a class to start -> 
+{% else %}
+	{% for subject in subjects %}
+	  <div class="card">
+	    <img class="card-img-top" src="http://placehold.it/239x180" alt="Card image cap">
+	    <div class="card-body">
+	      <h5 class="card-title">{{ subject.title }}</h5>
+	      <p class="card-text">
+			<ul class="list-unstyled mb-0">
+				{% for link in subject.links.all %}
+				<li>
+				  <a href="{{ link.url }}">{{ link.description }}</a>
+				</li>
+				{% endfor %}
+			</ul>
+	      </p>
+	    </div>
+	  </div>
+	{% endfor %}
+{% endif %}
+  
+</div>
+
+{% endblock %}
+
+{% block sidebar_title %}Class{% endblock %}
+
+{% block categories %}
+	
+	{% for class in classes %}
+		<li>
+			<a href="{% url 'study_material' class.class_number %}">{{ class }}</a>
+		</li>
+
+	{% endfor %}
+
+
+{% endblock %}

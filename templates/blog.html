@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block post %}
+
+	{% for post in posts %}
+		  <h1 class="mt-4">{{ post.title }}</h1>
+
+          <!-- Author -->
+          <p class="lead">
+            by
+            <a href="#">{{ post.author }}</a>
+          </p>
+
+          <hr>
+
+          <!-- Date/Time -->
+          <p>Posted on {{ post.published }}</p>
+
+          <hr>
+
+          <!-- Preview Image -->
+          <img class="img-fluid rounded" src="http://placehold.it/900x300" alt="">
+
+          <hr>
+
+          <!-- Post Content -->
+          <p class="lead">
+          	{{ post.content }}
+          </p>
+          <hr>
+	{% endfor %}
+
+{% endblock %}
+
+{% block categories %}
+
+  {% for section in sections %}
+    <li>
+    	<a href="#">{{ section }}</a>
+    </li>
+  {% endfor %}
+
+
+{% endblock %}

@@ -21,15 +21,23 @@ from django.conf.urls.static import static
 # views
 from awareness_blog.views import home_view
 from study_material.views import study_material_view
-from feedback.views import feedback_view
+from feedback.views import feedback_view, feedback_new_submit, feedback_existing_submit
 
 urlpatterns = [
+    # admin urls
     path('admin/', admin.site.urls),
+
+    # Awareness Blgo URLS
     path('', home_view, name="home"),
+
+    # Study Material URLS
     path('study_material/<int:class_no>/', study_material_view, name="study_material"),
     path('study_material/', study_material_view, name="study_material"),
-    path('feedback/', feedback_view, name="feedback"),
 
+    # Feedback URLS
+    path('feedback/', feedback_view, name="feedback"),
+    path('feedback_new_submit/', feedback_new_submit),
+    path('feedback_existing_submit/', feedback_existing_submit),
 
 
 ]  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

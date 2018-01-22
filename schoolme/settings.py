@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     #installed apps
     'awareness_blog',
     'study_material',
+    'feedback',
 
 
 ]

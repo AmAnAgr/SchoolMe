@@ -1,57 +1,55 @@
 {% extends 'base.html' %}
 {% block post %}
-<form class="mt-5 mb-5" action="/feedback_existing_submit/" method="post">
+<form class="mt-5 mb-5" action="/feedback_existing_submit/" method="post">{% csrf_token %}
   <div class="form-group">
-    <label for="exampleFormControlInput1">Your Email</label>
-    <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com">
+    <label for="email">Your Email</label>
+    <input type="email" class="form-control" id="email" placeholder="name@example.com">
   </div>
   <div class="form-group">
-    <label class="mr-sm-2" for="SchoolName">Select School</label>
-    <select class="custom-select mr-sm-2" id="SchoolName">
+    <label class="mr-sm-2" for="schoolName">Select School</label>
+    <select class="custom-select mr-sm-2" id="schoolName">
       <option selected>School...</option>
-      <option value="1">One</option>
-      <option value="2">Two</option>
-      <option value="3">Three</option>
+      {% for school in schools %}
+      <option value="{{ school.pk }}">{{ school }}</option>
+      {% endfor %}
     </select>
   </div>
   <div class="form-group">
-    <label for="exampleFormControlTextarea1">Feedback</label>
-    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+    <label for="feedback">Feedback</label>
+    <textarea class="form-control" id="feedback" rows="3"></textarea>
   </div>
   <button type="submit" class="btn btn-primary btn-md btn-block">Submit</button>
 </form>
 <hr>
 <center><b>OR</b></center>
 <hr>
-<form class="mt-5 mb-5"  action="/feedback_new_submit/" method="post">
+<form class="mt-5 mb-5"  action="/feedback_new_submit/" method="post">{% csrf_token %}
   <div class="form-group">
-    <label for="inputAddress">Name of School</label>
-    <input type="text" class="form-control" id="inputAddress" placeholder="St. Mary Academy">
+    <label for="schoolName">Name of School</label>
+    <input type="text" class="form-control" id="schoolName" placeholder="St. Mary Academy">
   </div>
 <div class="form-group">
-    <label for="exampleFormControlInput1">Your Email</label>
-    <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com">
+    <label for="email">Your Email</label>
+    <input type="email" class="form-control" id="email" placeholder="name@example.com">
   </div>
   <div class="form-row">
     <div class="form-group col-md-6">
-      <label for="inputCity">City / Village</label>
-      <input type="text" class="form-control" id="inputCity">
+      <label for="city">City / Village</label>
+      <input type="text" class="form-control" id="city">
     </div>
     <div class="form-group col-md-4">
-      <label for="inputState">State</label>
-      <select id="inputState" class="form-control">
-        <option selected>Choose...</option>
-        <option>...</option>
-      </select>
+      <label for="state">State</label>
+      <input type="text" class="form-control" id="state">
+
     </div>
     <div class="form-group col-md-2">
-      <label for="inputZip">Zip</label>
+      <label for="zip_code">Zip</label>
       <input type="text" class="form-control" id="inputZip">
     </div>
   </div>
   <div class="form-group">
-    <label for="exampleFormControlTextarea1">Feedback</label>
-    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+    <label for="feedback">Feedback</label>
+    <textarea class="form-control" id="feedback" rows="3"></textarea>
   </div>
   <button type="submit" class="btn btn-primary btn-md btn-block">Submit</button>
 </form>
@@ -65,9 +63,6 @@
   <div class="card-body">
     <div class="input-group">
       <input type="text" class="form-control" placeholder="Search for...">
-      <span class="input-group-btn ml-2">
-        <button class="btn btn-secondary" type="submit">Go!</button>
-      </span>
     </div>
   </div>
 </div>

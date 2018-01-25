@@ -21,7 +21,7 @@ from django.conf.urls.static import static
 # views
 from awareness_blog.views import home_view
 from study_material.views import study_material_view
-from feedback.views import feedback_view, school_search, save_feedback
+from feedback.views import feedback_view, school_search, save_feedback, get_feedback
 
 urlpatterns = [
     # admin urls
@@ -38,5 +38,6 @@ urlpatterns = [
     path('feedback/', feedback_view, name="feedback"),
     path('school_search', school_search),
     path('send_feedback', save_feedback),
+    path('get_feedback', get_feedback),
 
 ]  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

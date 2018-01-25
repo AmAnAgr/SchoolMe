@@ -44,3 +44,9 @@ def save_feedback(request):
 
 
 	return render(request, 'feedback.html', context)
+
+
+def get_feedback(request):
+	feedbacks = Feedback.objects.filter(school=School.objects.get(pk=request.GET.get('qpk')))[:10]
+	feedbacks = serializers.serialize('json', feedbacks)
+	return HttpResponse(feedbacks)

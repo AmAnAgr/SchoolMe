@@ -30,6 +30,24 @@
       </tr>
     </tbody>
   </table>
+
+    <table id='feedbackTable' class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Past Feedbacks</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr  ng-repeat="feedback in feedbacks">
+        <!-- TO BE PARSED BY ANGULAR JS -->
+        {% verbatim %} 
+        <td>{{ feedback['fields'].description }}</td>
+        {% endverbatim %}
+        <!-- /TO BE PARSED BY ANGULAR JS -->
+      </tr>
+    </tbody>
+  </table>
+
 </div>
 <script>
 // Fetching List of Schools from database
@@ -40,7 +58,8 @@ SearchApp.config(function($httpProvider) {
     $httpProvider.defaults.headers.post['X-CSRFToken'] = token;
 });
 
-SearchApp.service('ajaxService', ['$http', function($http){
+
+SearchApp.service('SchoolSearchService', ['$http', function($http){
     return {
         search: function(keywords){
             return $http.post('/school_search', { "q_school" : keywords });
@@ -48,14 +67,29 @@ SearchApp.service('ajaxService', ['$http', function($http){
     }
 }]);
 
-SearchApp.controller('MainCtrl', ['$scope', 'ajaxService', function($scope, ajaxService){    
+SearchApp.service('RetrieveFeedbackService',['$http',function($http){
+  return {
+    search: function(pk){
+      return $http({
+        url: '/get_feedback', 
+        method: "GET",
+        params: {qpk: pk}
+      });
+    }
+  }
+}]);
+
+SearchApp.controller('MainCtrl', ['$scope', 'SchoolSearchService', 'RetrieveFeedbackService',
+    function($scope, SchoolSearchService, RetrieveFeedbackService){      
     $scope.search = function(){
-        ajaxService.search($scope.keywords).then(function(response){
+        SchoolSearchService.search($scope.keywords).then(function(response){
             $scope.schools = response.data;
         });
     };
 
     $scope.selectSchool = function(pk){
+
+        // setting school fields in feedback form
         for (var i = $scope.schools.length - 1; i >= 0; i--) {
           if($scope.schools[i]['pk']==pk) {
             var school = $scope.schools[i];
@@ -67,6 +101,17 @@ SearchApp.controller('MainCtrl', ['$scope', 'ajaxService', function($scope, ajax
 
           }
         }
+
+        // fetch feedbacks for the selected school
+        RetrieveFeedbackService.search(pk).then(function(response){
+            console.log(response.data);
+            $scope.feedbacks = response.data;
+        });
+
+
+
+
+
     };
 
 }]);
@@ -82,7 +127,7 @@ SearchApp.controller('MainCtrl', ['$scope', 'ajaxService', function($scope, ajax
 {% block sidebar %}
 
 <div class="card my-4">
-  <h5 class="card-header">Most Feedbacks</h5>
+  <h5 class="card-header">Recent Feedbacks</h5>
   <div class="card-body">
     <ul class="list-group">
       <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -100,7 +145,6 @@ SearchApp.controller('MainCtrl', ['$scope', 'ajaxService', function($scope, ajax
     </ul>
   </div>
 </div>
-
 
 {% endblock %}
 

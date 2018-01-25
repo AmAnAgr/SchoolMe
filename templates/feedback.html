@@ -1,70 +1,179 @@
 {% extends 'base.html' %}
-{% block post %}
-<form class="mt-5 mb-5" action="/feedback_existing_submit/" method="post">{% csrf_token %}
-  <div class="form-group">
-    <label for="email">Your Email</label>
-    <input type="email" class="form-control" id="email" placeholder="name@example.com">
-  </div>
-  <div class="form-group">
-    <label class="mr-sm-2" for="schoolName">Select School</label>
-    <select class="custom-select mr-sm-2" id="schoolName">
-      <option selected>School...</option>
-      {% for school in schools %}
-      <option value="{{ school.pk }}">{{ school }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="feedback">Feedback</label>
-    <textarea class="form-control" id="feedback" rows="3"></textarea>
-  </div>
-  <button type="submit" class="btn btn-primary btn-md btn-block">Submit</button>
-</form>
-<hr>
-<center><b>OR</b></center>
-<hr>
-<form class="mt-5 mb-5"  action="/feedback_new_submit/" method="post">{% csrf_token %}
-  <div class="form-group">
-    <label for="schoolName">Name of School</label>
-    <input type="text" class="form-control" id="schoolName" placeholder="St. Mary Academy">
-  </div>
-<div class="form-group">
-    <label for="email">Your Email</label>
-    <input type="email" class="form-control" id="email" placeholder="name@example.com">
-  </div>
-  <div class="form-row">
-    <div class="form-group col-md-6">
-      <label for="city">City / Village</label>
-      <input type="text" class="form-control" id="city">
-    </div>
-    <div class="form-group col-md-4">
-      <label for="state">State</label>
-      <input type="text" class="form-control" id="state">
+{% load static %}
 
-    </div>
-    <div class="form-group col-md-2">
-      <label for="zip_code">Zip</label>
-      <input type="text" class="form-control" id="inputZip">
-    </div>
+{% block content_colm %}
+
+<div class="col-lg-8 mt-5 mb-5" ng-app="SearchApp" ng-controller="MainCtrl">
+  <div class="form-group">{% csrf_token %}
+  <input class="form-control" ng-model="keywords"  ng-change="search()" placeholder="Search School..." />
   </div>
-  <div class="form-group">
-    <label for="feedback">Feedback</label>
-    <textarea class="form-control" id="feedback" rows="3"></textarea>
-  </div>
-  <button type="submit" class="btn btn-primary btn-md btn-block">Submit</button>
-</form>
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>City</th>
+        <th>State</th>
+        <th>Zip Code</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="cursor: pointer;" ng-click="selectSchool(school['pk'])" class="selectSchool" ng-repeat="school in schools | filter:keywords">
+        <!-- TO BE PARSED BY ANGULAR JS -->
+        {% verbatim %} 
+        <td hidden>{{ school['pk'] }}</td>
+        <td>{{ school['fields'].name }}</td>
+        <td>{{ school['fields'].city }}</td>
+        <td>{{ school['fields'].state }}</td>
+        <td>{{ school['fields'].zip_code }}</td>
+        {% endverbatim %}
+        <!-- /TO BE PARSED BY ANGULAR JS -->
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script>
+// Fetching List of Schools from database
+var SearchApp = angular.module('SearchApp', []);
+
+SearchApp.config(function($httpProvider) {
+    var token = $('input[name=csrfmiddlewaretoken]').val();
+    $httpProvider.defaults.headers.post['X-CSRFToken'] = token;
+});
+
+SearchApp.service('ajaxService', ['$http', function($http){
+    return {
+        search: function(keywords){
+            return $http.post('/school_search', { "q_school" : keywords });
+        }
+    }
+}]);
+
+SearchApp.controller('MainCtrl', ['$scope', 'ajaxService', function($scope, ajaxService){    
+    $scope.search = function(){
+        ajaxService.search($scope.keywords).then(function(response){
+            $scope.schools = response.data;
+        });
+    };
+
+    $scope.selectSchool = function(pk){
+        for (var i = $scope.schools.length - 1; i >= 0; i--) {
+          if($scope.schools[i]['pk']==pk) {
+            var school = $scope.schools[i];
+            document.getElementById('spk').value=school['pk'];
+            document.getElementById('sname').value=school['fields'].name;
+            document.getElementById('scity').value=school['fields'].city;
+            document.getElementById('szip').value=school['fields'].zip_code;
+            document.getElementById('sstate').value=school['fields'].state;
+
+          }
+        }
+    };
+
+}]);
+
+
+
+
+
+</script>
 
 {% endblock %}
 
 {% block sidebar %}
 
 <div class="card my-4">
-  <h5 class="card-header">Search your school</h5>
+  <h5 class="card-header">Most Feedbacks</h5>
   <div class="card-body">
-    <div class="input-group">
-      <input type="text" class="form-control" placeholder="Search for...">
-    </div>
+    <ul class="list-group">
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a href="#">DAV School</a>
+        <span class="badge badge-primary badge-pill">14</span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+       <a href="#">Ram School</a>
+       <span class="badge badge-primary badge-pill">2</span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a href="#">Sharma School</a>
+        <span class="badge badge-primary badge-pill">1</span>
+      </li>
+    </ul>
   </div>
 </div>
 
+
 {% endblock %}
+
+
+{% block addRow %}
+
+<div class="row mb-5">
+  <div class="col-lg-8">  
+  {% if success %}
+
+  <div class="alert alert-success" role="alert">
+    Your Response was recorded!
+  </div>
+
+  {% elif success is False %}
+
+
+  <div class="alert alert-warning" role="alert">
+    Please Select a School!
+  </div>
+
+
+  {% endif %}
+  <form method="post" id="feedback_form" action="/send_feedback" >
+    {% csrf_token %}
+    <input type="text" name="pk" id="spk" hidden>
+    <div class="form-group">
+      <label for="sname">School</label>
+      <input type="text" class="form-control" name="name" id="sname" disabled>
+    </div>
+      <div class="form-row">
+    <div class="form-group col-md-6">
+      <label for="scity">City</label>
+      <input type="text" class="form-control" name="city" id="scity" disabled>
+    </div>
+    <div class="form-group col-md-4">
+      <label for="sstate">State</label>
+      <input type="text" class="form-control" name="state" id="sstate" disabled>
+    </div>
+    <div class="form-group col-md-2">
+      <label for="szip">Zip</label>
+      <input type="text" class="form-control" name="zip" id="szip" disabled>
+    </div>
+  </div>
+    <div class="form-group">
+      <label for="sfeedback">Feedback</label>
+      <textarea class="form-control" id="sfeedback" name="feedback" rows="3"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Send Feedback</button>
+  </form>
+  </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

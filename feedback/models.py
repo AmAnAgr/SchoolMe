@@ -19,10 +19,11 @@ class School(models.Model):
 		return self.name
 
 class Feedback(models.Model):
-	user_email = models.ForeignKey(
-		User,
-		on_delete=models.CASCADE,
-	)
+	# user_email = models.ForeignKey(
+	# 	User,
+	# 	on_delete=models.CASCADE,
+	# 	default=None,
+	# )
 	school = models.ForeignKey(
 		School,
 		on_delete=models.CASCADE
@@ -30,4 +31,4 @@ class Feedback(models.Model):
 	description = models.TextField()
 	
 	def __str__(self):
-		return self.user_email
+		return self.description
